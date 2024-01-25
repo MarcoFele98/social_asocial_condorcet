@@ -10,7 +10,7 @@ library(pracma) # for erfc
 library(numDeriv) # for finding derivatives
 
 rm(list = ls())
-load("social and asocial condorcet/data.RData")
+#load("social and asocial condorcet/data.RData")
 
 # Condorcet jury theorem ____________________________________________________________________________________________________________________________________----
 ## Functions ----
