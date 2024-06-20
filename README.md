@@ -1,4 +1,4 @@
-![fitness](https://github.com/MarcoFele98/social_asocial_condorcet/assets/122376407/fa9e230a-a171-490c-8472-a45c4f40cb47)# social_asocial_condorcet
+# social_asocial_condorcet
 Here is the replication of: "Phase coexistence in a forecasting game", Philippe Curty and Matteo Marsili J.Stat.Mech. (2006)
 
 ## Backgorund
