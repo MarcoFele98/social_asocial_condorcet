@@ -10,7 +10,7 @@ library(pracma) # for erfc
 library(numDeriv) # for finding derivatives
 
 rm(list = ls())
-#load("social and asocial condorcet/data.RData")
+load("social and asocial condorcet/data.RData")
 
 # Condorcet jury theorem ____________________________________________________________________________________________________________________________________----
 ## Functions ----
@@ -32,8 +32,16 @@ condorcet_data <- expand.grid(jury_size = seq(1, 100, by = 6),
 
 ggplot(condorcet_data) +
   geom_line(aes(prob_individual_correct, prob_jury_correct, 
-                color = as.factor(jury_size)))
+                color = as.factor(jury_size))) +
+  scale_color_discrete(name = "Jury size") +
+  ylab("Probabaility jury (group) correct") +
+  xlab("Probability judge (individual) correct") +
+  ggtitle("Condorcet jury theorem")
 
+ggsave("social and asocial condorcet/figures/condorcet.png",
+       height = 5,
+       width = 7,
+       bg = "white")
 
 # Condorcet jury theorem with social information ___________________________________________________________________________________________________________________________________-----
 ## Functions ----
@@ -144,16 +152,17 @@ results_evolution <- results_l |>
   mutate(eta_nash = eta[which.min(abs(expected_average_fitness - p))],
          # Add well defined fitness function (with demographic control) and selection gradient
          fitness_social = expected_average_fitness / (expected_average_fitness * eta + p * (1 - eta)),
-         fitness_asocial = p / (expected_average_fitness * eta + p * (1 - eta)),
-         fitness_group = fitness_social + fitness_asocial,
-         selection_gradient_social = numDeriv::grad(func = calc_fitness_social,
-                                                    x = eta,
-                                                    expected_average_fitness = expected_average_fitness,
-                                                    p = p),
-         selection_gradient_asocial = numDeriv::grad(func = calc_fitness_asocial,
-                                                    x = 1 - eta, # I think this is correct
-                                                    expected_average_fitness = expected_average_fitness,
-                                                    p = p))
+         fitness_asocial = p / (expected_average_fitness * eta + p * (1 - eta))
+         #fitness_group = fitness_social * eta + fitness_asocial * (1 - eta),
+         # selection_gradient_social = numDeriv::grad(func = calc_fitness_social,
+         #                                            x = eta,
+         #                                            expected_average_fitness = expected_average_fitness,
+         #                                            p = p),
+         # selection_gradient_asocial = numDeriv::grad(func = calc_fitness_asocial,
+         #                                            x = 1 - eta, # I think this is correct
+         #                                            expected_average_fitness = expected_average_fitness,
+         #                                            p = p)
+         )
 
 # Evolutionary analysis
 ggplot(results_evolution) +
@@ -178,17 +187,46 @@ ggplot(results_evolution) +
                color = "blue") +
   ylab("Fitness")
 
+ggsave("social and asocial condorcet/figures/fitness.png",
+       height = 3,
+       width = 5,
+       bg = "white")
 
-ggplot(results_evolution) +
-  geom_line(aes(eta, selection_gradient_social), color = "red", linewidth = 2) +
-  geom_line(aes(eta, selection_gradient_asocial), color = "blue", linewidth = 2) +
-  geom_vline(aes(xintercept = eta_nash), color = "purple", size = 2) +
-  geom_hline(aes(yintercept = 0), lty = "dotted", linewidth = 2) +
-  geom_point(aes(eta_nash, 0), color = "purple", size = 8) +
-  ylab("Selection gradient")
+# ggplot(results_evolution) +
+#   geom_line(aes(eta, selection_gradient_social), color = "red", linewidth = 2) +
+#   geom_line(aes(eta, selection_gradient_asocial), color = "blue", linewidth = 2) +
+#   geom_vline(aes(xintercept = eta_nash), color = "purple", size = 2) +
+#   geom_hline(aes(yintercept = 0), lty = "dotted", linewidth = 2) +
+#   geom_point(aes(eta_nash, 0), color = "purple", size = 8) +
+#   ylab("Selection gradient")
 # equilibria -> selection gradient == 0
 # stability -> derivative of selection gradient (second derivative of fitness) evaluated at equilibrium: positive unstable, negative stable
 
+# ggplot(results_evolution) +
+#   geom_line(aes(eta, fitness_social), color = "red", linewidth = 2) +
+#   geom_line(aes(eta, fitness_asocial), color = "blue", linewidth = 2) +
+#   geom_line(aes(eta, selection_gradient_social), color = "red", linewidth = 2) +
+#   geom_line(aes(eta, selection_gradient_asocial), color = "blue", linewidth = 2) 
+
+# ggsave("social and asocial condorcet/figures/selection_gradient.png",
+#        height = 3,
+#        width = 5,
+#        bg = "white")
+
+# test <- data.frame(x = seq(0, 5, l = 100),
+#                    f = sin(seq(0, 5, l = 100))) |>
+#   mutate(dfdx = grad(func = sin,
+#                      x = x))
+# 
+# test <- data.frame(x = seq(0, 1, l = 1000),
+#                    f = sin(seq(0, 5, l = 100))) |>
+#   mutate(dfdx = numDeriv::grad(func = calc_fitness_social,
+#                                 x = eta,
+#                                 expected_average_fitness = expected_average_fitness,
+#                                 p = p))
+# ggplot(test) +
+#   geom_line(aes(x, f)) +
+#   geom_line(aes(x, dfdx), color = "red") 
 
 # Replicate figure ----
 ggplot(results_evolution) +
@@ -199,4 +237,7 @@ ggplot(results_evolution) +
   #geom_vline(aes(xintercept = eta_nash), color = "purple", size = 2) +
   geom_point(aes(eta_nash, p), color = "purple", size = 8)
 
-
+ggsave("social and asocial condorcet/figures/bifurcation_social_dilemma.png",
+       height = 4,
+       width = 6,
+       bg = "white")
